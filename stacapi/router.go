@@ -1,4 +1,4 @@
-package main
+package stacapi
 
 import (
 	"net/http"
@@ -10,17 +10,15 @@ import (
 	"github.com/planetlabs/go-stac"
 )
 
-func main() {
-	router := gin.Default()
-
-	api := ginopenapi.NewRouter(router,
+func AddSTACRoutes(r gin.IRouter) {
+	api := ginopenapi.NewRouter(r,
 		option.WithTitle("STAC API - Go"),
 		option.WithVersion(internal.APIVersion),
 		option.WithDescription("STAC API implementation in Go."),
 		option.WithOpenAPIVersion("3.0.3"),
 		option.WithServer("http://localhost:8080"),
-		option.WithSpecPath(internal.ServiceDescHREF),
-		option.WithDocsPath(internal.ServiceDocHREF),
+		option.WithSpecPath(internal.ServiceDescPath),
+		option.WithDocsPath(internal.ServiceDocPath),
 	)
 
 	api.GET("/", internal.HandleLandingPage).With(
@@ -28,5 +26,4 @@ func main() {
 		option.Response(http.StatusOK, new(stac.Catalog)),
 	)
 
-	router.Run()
 }

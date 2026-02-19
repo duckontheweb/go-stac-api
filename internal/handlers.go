@@ -8,25 +8,16 @@ import (
 )
 
 func HandleLandingPage(c *gin.Context) {
-	root_link := RootLink()
-	self_link := SelfLink(RootHREF, ApplicationJSONType)
-	service_desc_link := stac.Link{
-		Href:  ServiceDescHREF,
-		Rel:   ServiceDescRel,
-		Type:  OpenAPIYAMLType,
-		Title: "OpenAPI YAML",
-	}
-	service_doc_link := stac.Link{
-		Href:  ServiceDocHREF,
-		Rel:   ServiceDocRel,
-		Type:  HTMLType,
-		Title: "OpenAPI Docs",
-	}
+	root_link := RootLink(c.Request)
+	self_link := SelfLink(c.Request, RootPath, ApplicationJSONType)
+	service_desc_link := ServiceDescLink(c.Request)
+	service_doc_link := ServiceDocLink(c.Request)
 
 	landing_page := stac.Catalog{
-		Version:     "1.0.0",
+		Version:     STACVersion,
 		Id:          "go-stac-api",
-		Description: "Golang implementation of the STAC API Spec",
+		ConformsTo:  []string{STACAPICoreConformanceURI},
+		Description: "Implementation of the STAC API Spec in Go",
 		Links:       []*stac.Link{&root_link, &self_link, &service_desc_link, &service_doc_link},
 	}
 	c.JSON(http.StatusOK, landing_page)
