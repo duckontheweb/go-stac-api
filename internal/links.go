@@ -8,22 +8,32 @@ import (
 )
 
 func RootLink(request *http.Request) stac.Link {
-	root_href := constructHREF(request, RootPath)
+	href := constructHREF(request, RootPath)
 	return stac.Link{
-		Href:  root_href,
+		Href:  href,
 		Rel:   RootRel,
 		Type:  ApplicationJSONType,
 		Title: "Root",
 	}
 }
 
-func SelfLink(request *http.Request, href, type_ string) stac.Link {
-	href = constructHREF(request, href)
+func SelfLink(request *http.Request, type_ string) stac.Link {
+	href := constructHREF(request, request.URL.Path)
 	return stac.Link{
 		Href:  href,
 		Rel:   SelfRel,
 		Type:  type_,
 		Title: "This Page",
+	}
+}
+
+func ParentLink(request *http.Request) stac.Link {
+	href := constructHREF(request, RootPath)
+	return stac.Link{
+		Href:  href,
+		Rel:   ParentRel,
+		Type:  ApplicationJSONType,
+		Title: "Root",
 	}
 }
 
@@ -44,6 +54,16 @@ func ServiceDocLink(request *http.Request) stac.Link {
 		Rel:   ServiceDocRel,
 		Type:  HTMLType,
 		Title: "OpenAPI Docs",
+	}
+}
+
+func DataLink(request *http.Request, path string) stac.Link {
+	href := constructHREF(request, path)
+	return stac.Link{
+		Href:  href,
+		Rel:   DataRel,
+		Type:  ApplicationJSONType,
+		Title: "Collections",
 	}
 }
 
