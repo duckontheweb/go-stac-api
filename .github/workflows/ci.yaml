@@ -35,7 +35,7 @@ jobs:
 
       - name: Run stac-api-validator
         run: |
-          uv run stac-api-validator
-            --root-url http://localhost:8080
-            --conformance core --conformance collections
+          uv run stac-api-validator \
+            --root-url http://localhost:8080 \
+            --conformance core --conformance collections \
             --collection naip
