@@ -5,6 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"os"
+	"path"
+	"path/filepath"
 
 	_ "github.com/duckdb/duckdb-go/v2"
 	"github.com/duckontheweb/go-stac-api/stacapi"
@@ -15,7 +18,24 @@ import (
 const BackendType = "duckdb"
 
 type Backend struct {
-	stacapi.BackendConfig
+	Config stacapi.BackendConfig
+}
+
+func (b Backend) GetConnection() (*sqlx.DB, error) {
+	connection_string := b.Config.ConnectionString
+	if !filepath.IsAbs(connection_string) {
+		cwd, err := os.Getwd()
+		if err != nil {
+			log.Fatal("Could not get current working directory, please provide an absolute path to the config file.")
+		}
+		connection_string, err = filepath.Abs(path.Join(cwd, connection_string))
+	}
+	db, err := sqlx.Connect("duckdb", connection_string)
+	if err != nil {
+		return new(sqlx.DB), err
+	}
+
+	return db, nil
 }
 
 func NewBackend(config stacapi.BackendConfig) (Backend, error) {
@@ -24,14 +44,14 @@ func NewBackend(config stacapi.BackendConfig) (Backend, error) {
 	}
 
 	backend := Backend{
-		BackendConfig: config,
+		Config: config,
 	}
 
 	return backend, nil
 }
 
 func (b Backend) ListCollections() []map[string]any {
-	db, err := sqlx.Connect("duckdb", b.ConnectionString)
+	db, err := sqlx.Connect("duckdb", b.Config.ConnectionString)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -55,7 +75,7 @@ func (b Backend) ListCollections() []map[string]any {
 }
 
 func (b Backend) GetCollection(id string) (map[string]any, error) {
-	db, err := sqlx.Connect("duckdb", b.ConnectionString)
+	db, err := b.GetConnection()
 	if err != nil {
 		return map[string]any{}, err
 	}

@@ -16,7 +16,10 @@ import (
 
 func main() {
 
-	config_path := flag.String("config_path", "./stac-api-config.yaml", "Path to the config file.")
+	config_path := flag.String("config-path", "./stac-api-config.yaml", "Path to the config file.")
+
+	flag.Parse()
+
 	config := readConfig(*config_path)
 
 	var backend stacapi.Backend

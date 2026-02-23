@@ -8,6 +8,28 @@ The aspiration is to provide a fully compliant STAC API implementation supportin
 Geoparquet, DuckDB) that can be used either as a configuration-driven command line tool or a Go module integrated into
 other Gin-based services.
 
+## Install
+
+Install with `go`:
+
+```console
+$ go install github.com/duckontheweb/go-stac-api/cmd/stac-server
+```
+
+Add the `go` installation directory to your `PATH` if you have not done so already. On a Mac, this is usually `~/go/bin`.
+
+## Quick Start
+
+Run installed binary:
+
+```console
+$ stac-server
+```
+
+This will serve the application on http://localhost:8080 using the configuration at
+[`./data/example-config.yaml](./data/example-config.yaml). This uses the DuckDB backend and connects to the file at
+`./data/example.duckdb`.
+
 ## STAC API Spec Compliance
 
 See [Backends](#backends) for details on the specific backend implementations.
@@ -49,25 +71,13 @@ database](https://duckdb.org/docs/stable/connect/overview#persistent-database). 
 - `id TEXT`: Unique Collection ID
 - `content JSON`: Valid JSON-encoded STAC Collection
 
-## Installation
+To use this backend, include the following `backend` config in your YAML config file:
 
-Install with `go`:
-
-```console
-$ go install github.com/duckontheweb/go-stac-api/cmd/stac-server
+```yaml
+backend:
+    type: duckdb
+    connection_string: /path/to/some/database.duckdb
 ```
-
-Add the `go` installation directory to your `PATH` if you have not done so already. On a Mac, this is usually `~/go/bin`.
-
-## Usage
-
-Run installed binary:
-
-```console
-$ stac-server
-```
-
-This will serve the application on http://localhost:8080.
 
 ## Development
 
