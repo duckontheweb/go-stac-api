@@ -3,7 +3,20 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
 jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+      - uses: pre-commit/action@v3.0.1
+
+
   validate-api:
     name: Validate STAC API
     runs-on: ubuntu-latest
