@@ -113,3 +113,5 @@ $ uv run stac-api-validator \
     --conformance core --conformance collections \
     --collection naip
 ```
+
+Pre-commit checks and STAC API validation are also run in CI.
