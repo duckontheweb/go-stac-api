@@ -16,7 +16,6 @@ type Api struct {
 	config       ApiConfig
 	backend      Backend
 	conformances []*IStacConformance
-	gin_router   *gin.IRouter
 }
 
 func NewApi(config ApiConfig, backend Backend) Api {
@@ -61,9 +60,7 @@ func (api *Api) ConformsTo() []string {
 	conforms_to := make([]string, 0)
 
 	for _, stac_router := range api.conformances {
-		for _, c := range (*stac_router).ConformanceClasses() {
-			conforms_to = append(conforms_to, c)
-		}
+		conforms_to = append(conforms_to, (*stac_router).ConformanceClasses()...)
 	}
 
 	return conforms_to
@@ -73,24 +70,22 @@ func (api *Api) LandingPageLinks(request *http.Request) []*stac.Link {
 	links := make([]*stac.Link, 0)
 
 	for _, stac_router := range api.conformances {
-		for _, l := range (*stac_router).LandingPageLinks(request) {
-			links = append(links, l)
-		}
+		links = append(links, (*stac_router).LandingPageLinks(request)...)
 	}
 
 	return links
 }
 
 type ApiConfig struct {
-	BackendConfig `yaml:"backend"`
+	Backend BackendConfig `yaml:"backend"`
 }
-
-type Backend interface{}
 
 type BackendConfig struct {
 	Type             string `yaml:"type"`
 	ConnectionString string `yaml:"connection_string"`
 }
+
+type Backend interface{}
 
 type IStacConformance interface {
 	AttachHandlers(router ginopenapi.Generator)

@@ -24,11 +24,11 @@ func main() {
 
 	var backend stacapi.Backend
 	var err error
-	switch config.BackendConfig.Type {
+	switch config.Backend.Type {
 	default:
-		log.Fatalf("Unsupported backend type: '%s'", config.BackendConfig.Type)
+		log.Fatalf("Unsupported backend type: '%s'", config.Backend.Type)
 	case duckdb.BackendType:
-		backend, err = duckdb.NewBackend(config.BackendConfig)
+		backend, err = duckdb.NewBackend(config.Backend)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -38,7 +38,10 @@ func main() {
 	stac_api := stacapi.NewApi(config, backend)
 	stac_api.AddToRouter(router)
 
-	router.Run()
+	err = router.Run()
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func readConfig(config_path string) stacapi.ApiConfig {
@@ -48,7 +51,12 @@ func readConfig(config_path string) stacapi.ApiConfig {
 		if err != nil {
 			log.Fatal("Could not get current working directory, please provide an absolute path to the config file.")
 		}
-		config_path, err = filepath.Abs(path.Join(cwd, config_path))
+		var abs_config_path string
+		abs_config_path, err = filepath.Abs(path.Join(cwd, config_path))
+		if err != nil {
+			log.Fatalf("Could not construct absolute path from relative path: %s", config_path)
+		}
+		config_path = abs_config_path
 	}
 	contents, err := os.ReadFile(config_path)
 	if err != nil {

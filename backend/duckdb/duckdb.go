@@ -2,7 +2,6 @@ package duckdb
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -11,7 +10,6 @@ import (
 
 	_ "github.com/duckdb/duckdb-go/v2"
 	"github.com/duckontheweb/go-stac-api/stacapi"
-	"github.com/go-viper/mapstructure/v2"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -28,7 +26,12 @@ func (b Backend) GetConnection() (*sqlx.DB, error) {
 		if err != nil {
 			log.Fatal("Could not get current working directory, please provide an absolute path to the config file.")
 		}
-		connection_string, err = filepath.Abs(path.Join(cwd, connection_string))
+		var abs_connection_string string
+		abs_connection_string, err = filepath.Abs(path.Join(cwd, connection_string))
+		if err != nil {
+			log.Fatalf("Could not construct absolute path from relative path: %s", connection_string)
+		}
+		connection_string = abs_connection_string
 	}
 	db, err := sqlx.Connect("duckdb", connection_string)
 	if err != nil {
@@ -40,7 +43,7 @@ func (b Backend) GetConnection() (*sqlx.DB, error) {
 
 func NewBackend(config stacapi.BackendConfig) (Backend, error) {
 	if config.Type != BackendType {
-		return Backend{}, errors.New(fmt.Sprintf("Backend type must be '%s', found '%s'", BackendType, config.Type))
+		return Backend{}, fmt.Errorf("Backend type must be '%s', found '%s'", BackendType, config.Type)
 	}
 
 	backend := Backend{
@@ -55,23 +58,20 @@ func (b Backend) ListCollections() []map[string]any {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	defer db.Close()
+	defer func() {
+		err = db.Close()
+	}()
+	if err != nil {
+		log.Print("Unable to close backend connection")
+	}
 
-	collections := []*Collection{}
+	collections := []map[string]any{}
 	err = db.Select(&collections, `SELECT content FROM collections;`)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	collections_list := make([]map[string]any, len(collections))
-
-	for i, collection := range collections {
-		m := map[string]any{}
-		mapstructure.Decode(collection, &m)
-		collections_list[i] = m
-	}
-
-	return collections_list
+	return collections
 }
 
 func (b Backend) GetCollection(id string) (map[string]any, error) {
@@ -79,7 +79,12 @@ func (b Backend) GetCollection(id string) (map[string]any, error) {
 	if err != nil {
 		return map[string]any{}, err
 	}
-	defer db.Close()
+	defer func() {
+		err = db.Close()
+	}()
+	if err != nil {
+		log.Print("Unable to close backend connection")
+	}
 
 	collection := map[string]any{}
 	err = db.Get(&collection, `SELECT content FROM collections WHERE id = $1;`, id)
@@ -104,14 +109,4 @@ type Link struct {
 	Rel   string
 	Type  string `json:"type,omitempty"`
 	Title string `json:"title,omitempty"`
-}
-
-func (c *Collection) Scan(src interface{}) error {
-	switch src.(type) {
-	default:
-		return errors.New("Failed to parse value.")
-	case map[string]interface{}:
-		mapstructure.Decode(src, c)
-		return nil
-	}
 }

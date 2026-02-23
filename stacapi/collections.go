@@ -83,13 +83,16 @@ func (r StacCollectionsConformance) HandleGetCollection(c *gin.Context) {
 		case CollectionNotFoundError:
 			c.JSON(http.StatusNotFound, err.Error())
 		default:
-			c.JSON(http.StatusInternalServerError, map[string]string{"error": "Internal server error."})
+			c.JSON(http.StatusInternalServerError, map[string]string{"error": "Internal server error: unable to fetch collection."})
 		}
 		return
 	}
 	raw_collection["version"] = raw_collection["stac_version"]
 	collection := stac.Collection{}
 	err = mapstructure.Decode(raw_collection, &collection)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, map[string]string{"error": "Internal server error: unable to decode collection."})
+	}
 
 	response_links := []*stac.Link{&root_link, &self_link, &parent_link}
 	reserved_rels := []string{RootRel, SelfRel, ParentRel}

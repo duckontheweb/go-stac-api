@@ -1,0 +1,14 @@
+repos:
+  - repo: https://github.com/golangci/golangci-lint
+    rev: v2.10.1
+    hooks:
+      - id: golangci-lint
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0  # Use the ref you want to point at
+    hooks:
+      - id: check-toml
+      - id: check-yaml
+      - id: detect-aws-credentials
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: trailing-whitespace

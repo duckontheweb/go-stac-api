@@ -8,5 +8,6 @@ dependencies = []
 
 [dependency-groups]
 dev = [
+    "pre-commit>=4.5.1",
     "stac-api-validator>=0.6.7",
 ]
