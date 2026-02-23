@@ -1,9 +1,10 @@
-package internal
+package stacapi
 
 import (
 	"net/http"
 	"net/url"
 
+	_ "github.com/go-viper/mapstructure/v2"
 	"github.com/planetlabs/go-stac"
 )
 

@@ -1,4 +1,4 @@
-package internal
+package stacapi
 
 const APIVersion = "0.1.0"
 const STACVersion = "1.1.0"
