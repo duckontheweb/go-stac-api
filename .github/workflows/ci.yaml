@@ -36,7 +36,7 @@ jobs:
       - name: Start server
         uses: JarvusInnovations/background-action@v1
         with:
-          run: go run cmd/stac-server -config-path ./data/example-config.yaml
+          run: go run cmd/stac-server/main.go -config-path ./data/example-config.yaml
           wait-on: |
             http://localhost:8080
           tail: true # true = stderr,stdout
