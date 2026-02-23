@@ -1,0 +1,104 @@
+package stacapi
+
+import (
+	"net/http"
+	"net/url"
+
+	_ "github.com/go-viper/mapstructure/v2"
+	"github.com/planetlabs/go-stac"
+)
+
+const (
+	RootPath        = "/"
+	ServiceDescPath = "/api"
+	ServiceDocPath  = "/api.html"
+)
+
+const (
+	ApplicationJSONType = "application/json"
+	OpenAPIYAMLType     = "application/x-yaml"
+	HTMLType            = "text/html"
+)
+
+const (
+	SelfRel        = "self"
+	RootRel        = "root"
+	ParentRel      = "parent"
+	ServiceDescRel = "service-desc"
+	ServiceDocRel  = "service-doc"
+	DataRel        = "data"
+)
+
+func rootLink(request *http.Request) stac.Link {
+	href := constructHREF(request, RootPath)
+	return stac.Link{
+		Href:  href,
+		Rel:   RootRel,
+		Type:  ApplicationJSONType,
+		Title: "Root",
+	}
+}
+
+func selfLink(request *http.Request, type_ string) stac.Link {
+	href := constructHREF(request, request.URL.Path)
+	return stac.Link{
+		Href:  href,
+		Rel:   SelfRel,
+		Type:  type_,
+		Title: "This Page",
+	}
+}
+
+func parentLink(request *http.Request) stac.Link {
+	href := constructHREF(request, RootPath)
+	return stac.Link{
+		Href:  href,
+		Rel:   ParentRel,
+		Type:  ApplicationJSONType,
+		Title: "Root",
+	}
+}
+
+func serviceDescLink(request *http.Request) stac.Link {
+	href := constructHREF(request, ServiceDescPath)
+	return stac.Link{
+		Href:  href,
+		Rel:   ServiceDescRel,
+		Type:  OpenAPIYAMLType,
+		Title: "OpenAPI YAML",
+	}
+}
+
+func serviceDocLink(request *http.Request) stac.Link {
+	href := constructHREF(request, ServiceDocPath)
+	return stac.Link{
+		Href:  href,
+		Rel:   ServiceDocRel,
+		Type:  HTMLType,
+		Title: "OpenAPI Docs",
+	}
+}
+
+func dataLink(request *http.Request, path string) stac.Link {
+	href := constructHREF(request, path)
+	return stac.Link{
+		Href:  href,
+		Rel:   DataRel,
+		Type:  ApplicationJSONType,
+		Title: "Collections",
+	}
+}
+
+func constructHREF(request *http.Request, path string) string {
+	scheme := "http"
+	if request.TLS != nil {
+		scheme = "https"
+	}
+	new_url := url.URL{
+		Scheme: scheme,
+		Host:   request.Host,
+		Path:   path,
+	}
+
+	return new_url.String()
+}

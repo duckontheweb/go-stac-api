@@ -3,15 +3,15 @@
 env_files = []
 root = "."
 testdata_dir = "testdata"
-tmp_dir = "tmp"
+tmp_dir = ".tmp"
 
 [build]
   args_bin = []
-  bin = "./tmp/main"
-  cmd = "go build -o ./tmp/main ./cmd/stac-server"
+  bin = "./.tmp/main"
+  cmd = "go build -o ./.tmp/main ./cmd/stac-server"
   delay = 1000
-  entrypoint = ["./tmp/main"]
-  exclude_dir = ["assets", "tmp", "vendor", "testdata"]
+  entrypoint = ["./.tmp/main"]
+  exclude_dir = ["assets", ".tmp", "vendor", "testdata"]
   exclude_file = []
   exclude_regex = ["_test.go"]
   exclude_unchanged = false

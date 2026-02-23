@@ -3,42 +3,31 @@ package duckdb
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"log"
-	"os"
 
 	_ "github.com/duckdb/duckdb-go/v2"
 	"github.com/duckontheweb/go-stac-api/stacapi"
 	"github.com/go-viper/mapstructure/v2"
 	"github.com/jmoiron/sqlx"
-	"gopkg.in/yaml.v3"
 )
 
-type BackendConfig struct {
-	ConnectionString string `yaml:"connection_string"`
-}
+const BackendType = "duckdb"
 
 type Backend struct {
-	BackendConfig
+	stacapi.BackendConfig
 }
 
-func NewBackend(config_path string) Backend {
-	var config BackendConfig
-
-	contents, err := os.ReadFile(config_path)
-	if err != nil {
-		log.Fatalf("Could not read config file at path %s", config_path)
-	}
-
-	err = yaml.Unmarshal(contents, &config)
-	if err != nil {
-		log.Fatalf("Could not parse config file at path %s as config YAML", config_path)
+func NewBackend(config stacapi.BackendConfig) (Backend, error) {
+	if config.Type != BackendType {
+		return Backend{}, errors.New(fmt.Sprintf("Backend type must be '%s', found '%s'", BackendType, config.Type))
 	}
 
 	backend := Backend{
 		BackendConfig: config,
 	}
 
-	return backend
+	return backend, nil
 }
 
 func (b Backend) ListCollections() []map[string]any {

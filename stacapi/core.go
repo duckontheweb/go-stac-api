@@ -9,24 +9,28 @@ import (
 	"github.com/planetlabs/go-stac"
 )
 
-type CoreRouter struct {
-	api *StacApi
+const StacCoreConformanceURI = "https://api.stacspec.org/v1.0.0/core"
+
+const STACVersion = "1.1.0"
+
+type StacCoreConformance struct {
+	api *Api
 }
 
-func (r *CoreRouter) AttachTo(api *StacApi) {
-	api.AddStacRouter(r)
+func (r *StacCoreConformance) AttachTo(api *Api) {
+	api.AddConformance(r)
 	r.api = api
 }
 
-func (r CoreRouter) ConformanceClasses() []string {
-	return []string{STACAPICoreConformanceURI}
+func (r StacCoreConformance) ConformanceClasses() []string {
+	return []string{StacCoreConformanceURI}
 }
 
-func (r CoreRouter) LandingPageLinks(request *http.Request) []*stac.Link {
-	root_link := RootLink(request)
-	self_link := SelfLink(request, ApplicationJSONType)
-	service_desc_link := ServiceDescLink(request)
-	service_doc_link := ServiceDocLink(request)
+func (r StacCoreConformance) LandingPageLinks(request *http.Request) []*stac.Link {
+	root_link := rootLink(request)
+	self_link := selfLink(request, ApplicationJSONType)
+	service_desc_link := serviceDescLink(request)
+	service_doc_link := serviceDocLink(request)
 	return []*stac.Link{
 		&root_link,
 		&self_link,
@@ -35,25 +39,14 @@ func (r CoreRouter) LandingPageLinks(request *http.Request) []*stac.Link {
 	}
 }
 
-func (r CoreRouter) AttachHandlers(gr gin.IRouter) {
-	api := ginopenapi.NewRouter(gr,
-		option.WithTitle("STAC API - Go"),
-		option.WithVersion(APIVersion),
-		option.WithDescription("STAC API implementation in Go."),
-		option.WithOpenAPIVersion("3.0.3"),
-		option.WithServer("http://localhost:8080"),
-		option.WithSpecPath(ServiceDescPath),
-		option.WithDocsPath(ServiceDocPath),
-	)
-
-	api.GET(RootPath, r.HandleLandingPage).With(
+func (r StacCoreConformance) AttachHandlers(router ginopenapi.Generator) {
+	router.GET(RootPath, r.HandleLandingPage).With(
 		option.Summary("Landing Page"),
 		option.Response(http.StatusOK, new(stac.Catalog)),
 	)
 }
 
-func (r CoreRouter) HandleLandingPage(c *gin.Context) {
-
+func (r StacCoreConformance) HandleLandingPage(c *gin.Context) {
 	landing_page := stac.Catalog{
 		Version:     STACVersion,
 		Id:          "go-stac-api",
