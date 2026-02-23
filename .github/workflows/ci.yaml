@@ -1,0 +1,25 @@
+name: ci
+on: [push]
+jobs:
+  validate-api:
+    name: Validate STAC API
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          # Install a specific version of uv.
+          version: "0.10.4"
+      - name: Set up Python
+        run: uv python install
+      - name: Install project
+        run: uv sync --locked --all-extras --dev
+
+      - name: Run stac-api-validator
+        run: |
+          uv run stac-api-validator
+            --root-url http://localhost:8080
+            --conformance core --conformance collections
+            --collection naip

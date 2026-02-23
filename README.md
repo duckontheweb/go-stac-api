@@ -84,5 +84,32 @@ backend:
 The project is configured to use [`air`](https://github.com/air-verse/air) for live reloading:
 
 ```console
-$ air ./cmd/stac-server
+$ air
+```
+
+We also define pre-commit hooks using Python's `pre-commit` library. To install the pre-commit hooks you will need
+to have [`uv` installed](https://docs.astral.sh/uv/getting-started/installation/). Then run:
+
+```console
+$ uv sync --all-groups
+$ uv run pre-commit install
+```
+
+To validate the STAC API using [stac-api-validator](https://github.com/stac-utils/stac-api-validator) (after you have run `uv sync`):
+
+Start the server:
+
+```console
+$ air
+# or
+$ stac-server
+```
+
+Run the validator:
+
+```console
+$ uv run stac-api-validator \
+    --root-url http://localhost:8080 \
+    --conformance core --conformance collections \
+    --collection naip
 ```
