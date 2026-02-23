@@ -10,7 +10,7 @@ import (
 )
 
 type CollectionsRouter struct {
-	api     *STACApi
+	api     *StacApi
 	backend ICollectionsBackend
 }
 
@@ -20,8 +20,8 @@ func NewCollectionsRouter(backend ICollectionsBackend) CollectionsRouter {
 	}
 }
 
-func (r *CollectionsRouter) AttachTo(api *STACApi) {
-	api.AddSTACRouter(r)
+func (r *CollectionsRouter) AttachTo(api *StacApi) {
+	api.AddStacRouter(r)
 	r.api = api
 }
 

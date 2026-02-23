@@ -10,7 +10,7 @@ import (
 func main() {
 	router := gin.Default()
 
-	stac_api := stacapi.STACApi{}
+	stac_api := stacapi.StacApi{}
 
 	core_router := stacapi.CoreRouter{}
 	core_router.AttachTo(&stac_api)

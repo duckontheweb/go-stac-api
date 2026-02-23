@@ -10,11 +10,11 @@ import (
 )
 
 type CoreRouter struct {
-	api *STACApi
+	api *StacApi
 }
 
-func (r *CoreRouter) AttachTo(api *STACApi) {
-	api.AddSTACRouter(r)
+func (r *CoreRouter) AttachTo(api *StacApi) {
+	api.AddStacRouter(r)
 	r.api = api
 }
 

@@ -1,4 +1,3 @@
-// Package stacapi provides entrypoints and interfaces for constructing a STAC API server.
 package stacapi
 
 import (
@@ -8,21 +7,21 @@ import (
 	"github.com/planetlabs/go-stac"
 )
 
-type STACApi struct {
-	routers []*ISTACRouter
+type StacApi struct {
+	routers []*IStacConformance
 }
 
-func (api *STACApi) AddSTACRouter(stac_router ISTACRouter) {
+func (api *StacApi) AddStacRouter(stac_router IStacConformance) {
 	api.routers = append(api.routers, &stac_router)
 }
 
-func (api *STACApi) AttachHandlers(gin_router gin.IRouter) {
+func (api *StacApi) AttachHandlers(gin_router gin.IRouter) {
 	for _, stac_router := range api.routers {
 		(*stac_router).AttachHandlers(gin_router)
 	}
 }
 
-func (api *STACApi) ConformsTo() []string {
+func (api *StacApi) ConformsTo() []string {
 	conforms_to := make([]string, 0)
 
 	for _, stac_router := range api.routers {
@@ -34,7 +33,7 @@ func (api *STACApi) ConformsTo() []string {
 	return conforms_to
 }
 
-func (api *STACApi) LandingPageLinks(request *http.Request) []*stac.Link {
+func (api *StacApi) LandingPageLinks(request *http.Request) []*stac.Link {
 	links := make([]*stac.Link, 0)
 
 	for _, stac_router := range api.routers {
@@ -46,7 +45,7 @@ func (api *STACApi) LandingPageLinks(request *http.Request) []*stac.Link {
 	return links
 }
 
-type ISTACRouter interface {
+type IStacConformance interface {
 	AttachHandlers(gin_router gin.IRouter)
 	ConformanceClasses() []string
 	LandingPageLinks(request *http.Request) []*stac.Link
