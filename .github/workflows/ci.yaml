@@ -33,6 +33,15 @@ jobs:
       - name: Install project
         run: uv sync --locked --all-extras --dev
 
+      - name: Start server
+        uses: JarvusInnovations/background-action@v1
+        with:
+          run: go run cmd/stac-server -config-path ./data/example-config.yaml
+          wait-on: |
+            http://localhost:8080
+          tail: true # true = stderr,stdout
+          log-output-resume: stderr
+          wait-for: 1m
       - name: Run stac-api-validator
         run: |
           uv run stac-api-validator \
