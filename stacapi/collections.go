@@ -72,7 +72,7 @@ func (r StacCollectionsConformance) HandleGetCollection(c *gin.Context) {
 	if err := c.ShouldBindUri(&req); err != nil {
 		c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request."})
 	}
-	// root_link := rootLink(c.Request)
+	root_link := rootLink(c.Request)
 	self_link := selfLink(c.Request, ApplicationJSONType)
 	parent_link := parentLink(c.Request)
 
@@ -94,7 +94,7 @@ func (r StacCollectionsConformance) HandleGetCollection(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, map[string]string{"error": "Internal server error: unable to decode collection."})
 	}
 
-	response_links := []*stac.Link{&self_link, &parent_link}
+	response_links := []*stac.Link{&root_link, &self_link, &parent_link}
 	reserved_rels := []string{RootRel, SelfRel, ParentRel}
 	for _, link := range collection.Links {
 		if !slices.Contains(reserved_rels, link.Rel) {
