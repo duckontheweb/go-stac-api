@@ -33,10 +33,12 @@ jobs:
       - name: Install project
         run: uv sync --locked --all-extras --dev
 
+      - name: Build server
+        run: go build -tags duckdb -o ./tmp/stac-server ./cmd/stac-server
       - name: Start server
         uses: JarvusInnovations/background-action@v1
         with:
-          run: go run cmd/stac-server/main.go -config-path ./backend/duckdb/example/config.yaml
+          run: go run /tmp/stac-server -config-path ./example/duckdb/config.yaml
           wait-on: |
             http-get://localhost:8080/
           tail: true # true = stderr,stdout
