@@ -34,7 +34,7 @@ jobs:
         run: uv sync --locked --all-extras --dev
 
       - name: Build server
-        run: go build -tags duckdb -o ./tmp/stac-server ./cmd/stac-server
+        run: go build -tags duckdb -o /tmp/stac-server ./cmd/stac-server
       - name: Start server
         uses: JarvusInnovations/background-action@v1
         with:
