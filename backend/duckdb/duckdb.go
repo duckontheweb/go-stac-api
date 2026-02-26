@@ -13,14 +13,28 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-const BackendType = "duckdb"
-
-type Backend struct {
-	Config stacapi.BackendConfig
+func init() {
+	stacapi.RegisterBackend(BackendType, Backend{})
 }
 
-func (b Backend) GetConnection() (*sqlx.DB, error) {
-	connection_string := b.Config.ConnectionString
+const BackendType = "duckdb"
+
+type Backend struct{}
+
+type BackendClient struct {
+	db *sqlx.DB
+}
+
+func (b BackendClient) Close() error {
+	return b.db.Close()
+}
+
+func (b Backend) GetClient(config stacapi.BackendConfig) (stacapi.BackendClient, error) {
+	if config.Type != BackendType {
+		return BackendClient{}, fmt.Errorf("Backend type must be '%s', found '%s'", BackendType, config.Type)
+	}
+
+	connection_string := config.ConnectionString
 	if !filepath.IsAbs(connection_string) {
 		cwd, err := os.Getwd()
 		if err != nil {
@@ -35,38 +49,15 @@ func (b Backend) GetConnection() (*sqlx.DB, error) {
 	}
 	db, err := sqlx.Connect("duckdb", connection_string)
 	if err != nil {
-		return new(sqlx.DB), err
+		log.Fatal("Unable to connect to database.")
 	}
 
-	return db, nil
+	return BackendClient{db: db}, nil
 }
 
-func NewBackend(config stacapi.BackendConfig) (Backend, error) {
-	if config.Type != BackendType {
-		return Backend{}, fmt.Errorf("Backend type must be '%s', found '%s'", BackendType, config.Type)
-	}
-
-	backend := Backend{
-		Config: config,
-	}
-
-	return backend, nil
-}
-
-func (b Backend) ListCollections() []map[string]any {
-	db, err := sqlx.Connect("duckdb", b.Config.ConnectionString)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	defer func() {
-		err = db.Close()
-	}()
-	if err != nil {
-		log.Print("Unable to close backend connection")
-	}
-
+func (b BackendClient) ListCollections() []map[string]any {
 	collections := []map[string]any{}
-	err = db.Select(&collections, `SELECT content FROM collections;`)
+	err := b.db.Select(&collections, `SELECT content FROM collections;`)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -74,20 +65,9 @@ func (b Backend) ListCollections() []map[string]any {
 	return collections
 }
 
-func (b Backend) GetCollection(id string) (map[string]any, error) {
-	db, err := b.GetConnection()
-	if err != nil {
-		return map[string]any{}, err
-	}
-	defer func() {
-		err = db.Close()
-	}()
-	if err != nil {
-		log.Print("Unable to close backend connection")
-	}
-
+func (b BackendClient) GetCollection(id string) (map[string]any, error) {
 	collection := map[string]any{}
-	err = db.Get(&collection, `SELECT content FROM collections WHERE id = $1;`, id)
+	err := b.db.Get(&collection, `SELECT content FROM collections WHERE id = $1;`, id)
 	if err != nil {
 		if err != sql.ErrNoRows {
 			return map[string]any{}, err

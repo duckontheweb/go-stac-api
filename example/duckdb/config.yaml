@@ -1,0 +1,3 @@
+backend:
+  type: duckdb
+  connection_string: ./example/duckdb/data.duckdb

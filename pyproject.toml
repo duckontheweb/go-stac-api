@@ -9,5 +9,6 @@ dependencies = []
 [dependency-groups]
 dev = [
     "pre-commit>=4.5.1",
+    "pypgstac>=0.9.9",
     "stac-api-validator>=0.6.7",
 ]
