@@ -38,7 +38,7 @@ jobs:
       - name: Start server
         uses: JarvusInnovations/background-action@v1
         with:
-          run: go run /tmp/stac-server -config-path ./example/duckdb/config.yaml
+          run: /tmp/stac-server -config-path ./example/duckdb/config.yaml
           wait-on: |
             http-get://localhost:8080/
           tail: true # true = stderr,stdout
