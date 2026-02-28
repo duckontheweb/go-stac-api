@@ -45,6 +45,7 @@ jobs:
           log-output-resume: stderr
           wait-for: 1m
       - name: Run stac-api-validator
+        timeout-minutes: 5
         run: |
           uv run stac-api-validator \
             --root-url http://localhost:8080 \

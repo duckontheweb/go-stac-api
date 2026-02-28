@@ -51,7 +51,7 @@ func (r StacCollectionsConformance) AttachHandlers(router ginopenapi.Generator) 
 	router.GET(GetCollectionPath, r.HandleGetCollection).With(
 		option.Summary("Get Collection"),
 		option.Request(new(GetCollectionRequest)),
-		option.Response(http.StatusOK, new(map[string]any)),
+		option.Response(http.StatusOK, new(stac.Collection)),
 	)
 }
 

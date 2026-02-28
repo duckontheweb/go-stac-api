@@ -47,6 +47,7 @@ func (b Backend) GetClient(config stacapi.BackendConfig) (stacapi.BackendClient,
 		}
 		connection_string = abs_connection_string
 	}
+	connection_string += "?access_mode=READ_ONLY"
 	db, err := sqlx.Connect("duckdb", connection_string)
 	if err != nil {
 		log.Fatal("Unable to connect to database.")
