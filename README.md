@@ -135,6 +135,7 @@ and write STAC objects. Concrete backends must implement these interfaces to be 
 ### `duckdb`
 
 **Go Package:** `github.com/duckontheweb/go-stac-api/backend/duckdb
+**Example:** [./example/duckdb](./example/duckdb/)
 
 This backend uses [DuckDB](https://duckdb.org/) to read STAC objects from a [persistent
 database](https://duckdb.org/docs/stable/connect/overview#persistent-database). This persistent backend must have a
