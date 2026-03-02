@@ -1,4 +1,5 @@
-DELETE FROM collections;
+DROP TABLE IF EXISTS collections;
+CREATE TABLE collections (id TEXT, content JSON);
 INSERT INTO collections
 SELECT id
     , {
