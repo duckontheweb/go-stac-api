@@ -14,20 +14,26 @@ func main() {
 	config_path := flag.String("config-path", "./stac-api-config.yaml", "Path to the config file.")
 
 	flag.Parse()
+	log.Printf("Config path: %s", *config_path)
 
 	config := stacapi.ReadConfig(*config_path)
 
 	router := gin.Default()
+	err := router.SetTrustedProxies(nil)
+	if err != nil {
+		log.Fatalf("Could not set trusted proxies: %s", err)
+	}
+
 	stac_api := stacapi.NewApi(config)
 	defer func() {
-		err := stac_api.Shutdown()
+		err = stac_api.Shutdown()
 		if err != nil {
 			log.Fatalf("Unable to close client for %s backend", err)
 		}
 	}()
 	stac_api.AddToRouter(router)
 
-	err := router.Run()
+	err = router.Run()
 	if err != nil {
 		log.Fatal(err)
 	}

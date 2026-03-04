@@ -1,0 +1,33 @@
+services:
+  database:
+    image: ghcr.io/stac-utils/pgstac:v0.9.9
+    container_name: pgstac-database
+    expose:
+      - 5432
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD
+      - POSTGRES_DB=pgstac
+    healthcheck:
+      test: ["CMD", "pg_isready"]
+      interval: 30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+  seed:
+    image: ghcr.io/stac-utils/pgstac-pypgstac:v0.9.9
+    container_name: pgstac-seed
+    volumes:
+      - ..:/mnt
+    environment:
+      - PGUSER=postgres
+      - PGPASSWORD=${POSTGRES_PASSWORD}
+      - PGDATABASE=pgstac
+      - PGHOST=database
+    entrypoint: ["/mnt/pgstac/load-data.sh"]
+    depends_on:
+      database:
+        condition: service_healthy
+        restart: true

@@ -1,0 +1,3 @@
+backend:
+  type: pgstac
+  connection_string: postgresql://postgres:pgstac@database:5432/pgstac?sslmode=disable
