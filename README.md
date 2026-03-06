@@ -249,21 +249,15 @@ $ uv run pre-commit install
 
 To validate the STAC API using [stac-api-validator](https://github.com/stac-utils/stac-api-validator) (after you have run `uv sync`):
 
-Start the server:
+1. Start the server (see [Run Locally](#run-locally) above)
 
-```console
-$ air
-# or
-$ stac-server
-```
+2. Run the validator:
 
-Run the validator:
-
-```console
-$ uv run stac-api-validator \
-    --root-url http://localhost:8080 \
-    --conformance core --conformance collections \
-    --collection naip
-```
+    ```console
+    $ uv run stac-api-validator \
+        --root-url http://localhost:8080 \
+        --conformance core --conformance collections \
+        --collection naip
+    ```
 
 Pre-commit checks and STAC API validation are also run in CI.
