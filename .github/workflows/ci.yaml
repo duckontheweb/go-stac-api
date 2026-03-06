@@ -48,6 +48,7 @@ jobs:
             http-get://localhost:8080/
           tail: true # true = stderr,stdout
           log-output-resume: stderr
+          log-output-if: true
           wait-for: 2m
       - name: Run stac-api-validator
         timeout-minutes: 5
