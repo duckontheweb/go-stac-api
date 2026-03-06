@@ -78,16 +78,3 @@ func (b BackendClient) GetCollection(id string) (map[string]any, error) {
 
 	return collection, nil
 }
-
-type Collection struct {
-	Id               string         `mapstructure:"id"`
-	Links            []*Link        `mapstructure:"links"`
-	AdditionalFields map[string]any `mapstructure:",remain"`
-}
-
-type Link struct {
-	HREF  string
-	Rel   string
-	Type  string `json:"type,omitempty"`
-	Title string `json:"title,omitempty"`
-}

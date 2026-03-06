@@ -154,12 +154,67 @@ backend:
 
 ## Development
 
-The project is configured to use [`air`](https://github.com/air-verse/air) for live reloading:
+### Run Locally
+The project is configured to use [`air`](https://github.com/air-verse/air) for hot reloading within containers managed
+by Docker Compose.
+
+To run the server with the default DuckDB backend:
 
 ```console
-$ air
+$ docker compose -f ./docker/docker-compose.yaml up
 ```
 
+To use the PgSTAC backend instead, copy the [`docker/.env.example`](./docker/.env.example) file to `docker/.env` and
+uncomment the lines defining the `BACKEND` and `POSTGRES_PASSWORD` variables, then run the same command as above.
+
+### Debug
+
+To run the server using Go's [Delve Debugger](https://github.com/go-delve/delve), set `DEBUG=TRUE` in either the
+`docker/.env` or in you command:
+
+```console
+$ DEBUG=TRUE docker compose -f ./docker/docker-compose.yaml up
+```
+
+This will start the debug server listening on port `2345` (you can change this port by setting the `DEBUG_PORT`
+enviromment variable). The API will _not start until a debugger is attached_.
+
+To attach a debugger using VSCode:
+
+1. Add the following configuration to your `launch.json` file
+
+    ```json
+    {
+        "version": "0.2.0",
+        "configurations": [
+            {
+                "name": "Connect to server",
+                "type": "go",
+                "debugAdapter": "dlv-dap",
+                "request": "attach",
+                "mode": "remote",
+                "substitutePath": [{
+                    "from": "${workspaceFolder}",
+                    "to": "/mnt"
+                }],
+                "port": 2345,
+            }
+        ]
+    }
+    ```
+
+2. Start the server in debug mode
+
+    ```console
+    $ DEBUG=TRUE docker compose -f ./docker/docker-compose.yaml up
+    ```
+
+3. Connect the debugger using the "Connect to server" option in the Run and Debug panel
+
+   ![Connect Debugger](./img/connect_debugger.mp4)
+
+
+### Code Quality
 We also define pre-commit hooks using Python's `pre-commit` library. To install the pre-commit hooks you will need
 to have [`uv` installed](https://docs.astral.sh/uv/getting-started/installation/). Then run:
 
