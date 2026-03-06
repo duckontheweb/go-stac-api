@@ -24,6 +24,9 @@ jobs:
     strategy:
       matrix:
         backend: ["duckdb", "pgstac"]
+        include:
+          - backend: pgstac
+            postgres_password: pgstac
     steps:
       - uses: actions/checkout@v6
       - name: Install uv
@@ -49,6 +52,6 @@ jobs:
         timeout-minutes: 5
         run: |
           uv run stac-api-validator \
-            --root-url http://localhost:8080 \
+            --root-url http://api:8080 \
             --conformance core --conformance collections \
             --collection naip
