@@ -235,7 +235,7 @@ To attach a debugger using VSCode:
 
 3. Connect the debugger using the "Connect to server" option in the Run and Debug panel
 
-   ![Connect Debugger](./img/connect_debugger.mp4)
+   ![Connect Debugger](https://raw.githubusercontent.com/duckontheweb/go-stac-api/pgstac-backend/img/connect_debugger.mp4)
 
 
 ### Code Quality
