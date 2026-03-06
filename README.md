@@ -107,24 +107,24 @@ so the DuckDB backend import actually happens in a [separate file](./cmd/stac-se
 
 See [Backends](#backends) for details on the specific backend implementations.
 
-| **Capability** | **DuckDB Backend** |
-| -- | -- |
-| [STAC API - Core](https://github.com/radiantearth/stac-api-spec/blob/release/v1.0.0/core) | ✅ |
-| [STAC API - Collections](https://github.com/radiantearth/stac-api-spec/blob/release/v1.0.0/ogcapi-features/README.md#stac-api---collections) | ✅ |
-| [STAC API - Features](https://github.com/radiantearth/stac-api-spec/blob/release/v1.0.0/ogcapi-features) | ✖️ |
-| [STAC API - Item Search](https://github.com/radiantearth/stac-api-spec/blob/release/v1.0.0/item-search) | ✖️ |
-| [Aggregation extension](https://github.com/stac-api-extensions/aggregation) | ✖️ |
-| [Browseable extension](https://github.com/stac-api-extensions/browseable) | ✖️ |
-| [Children extension](https://github.com/stac-api-extensions/children) | ✖️ |
-| [Collection search extension](https://github.com/stac-api-extensions/collection-search) | ✖️ |
-| [Collection transaction extension](https://github.com/stac-api-extensions/collection-transaction) | ✖️ |
-| [Fields extension](https://github.com/stac-api-extensions/fields) | ✖️ |
-| [Filter extension](https://github.com/stac-api-extensions/filter) | ✖️ |
-| [Free-text search extension](https://github.com/stac-api-extensions/freetext-search) | ✖️ |
-| [Language (I18N) extension](https://github.com/stac-api-extensions/language) | ✖️ |
-| [Query extension](https://github.com/stac-api-extensions/query) | ✖️ |
-| [Sort extension](https://github.com/stac-api-extensions/sort) | ✖️ |
-| [Transaction extension](https://github.com/stac-api-extensions/transaction) | ✖️ |
+| **Capability** | **DuckDB Backend** | **PgSTAC Backend** |
+| -- | -- | -- |
+| [STAC API - Core](https://github.com/radiantearth/stac-api-spec/blob/release/v1.0.0/core) | ✅ | ✅ |
+| [STAC API - Collections](https://github.com/radiantearth/stac-api-spec/blob/release/v1.0.0/ogcapi-features/README.md#stac-api---collections) | ✅ | ✅ |
+| [STAC API - Features](https://github.com/radiantearth/stac-api-spec/blob/release/v1.0.0/ogcapi-features) | ✖️ | ✖️ |
+| [STAC API - Item Search](https://github.com/radiantearth/stac-api-spec/blob/release/v1.0.0/item-search) | ✖️ | ✖️ |
+| [Aggregation extension](https://github.com/stac-api-extensions/aggregation) | ✖️ | ✖️ |
+| [Browseable extension](https://github.com/stac-api-extensions/browseable) | ✖️ | ✖️ |
+| [Children extension](https://github.com/stac-api-extensions/children) | ✖️ | ✖️ |
+| [Collection search extension](https://github.com/stac-api-extensions/collection-search) | ✖️ | ✖️ |
+| [Collection transaction extension](https://github.com/stac-api-extensions/collection-transaction) | ✖️ | ✖️ |
+| [Fields extension](https://github.com/stac-api-extensions/fields) | ✖️ | ✖️ |
+| [Filter extension](https://github.com/stac-api-extensions/filter) | ✖️ | ✖️ |
+| [Free-text search extension](https://github.com/stac-api-extensions/freetext-search) | ✖️ | ✖️ |
+| [Language (I18N) extension](https://github.com/stac-api-extensions/language) | ✖️ | ✖️ |
+| [Query extension](https://github.com/stac-api-extensions/query) | ✖️ | ✖️ |
+| [Sort extension](https://github.com/stac-api-extensions/sort) | ✖️ | ✖️ |
+| [Transaction extension](https://github.com/stac-api-extensions/transaction) | ✖️ | ✖️ |
 
 ## Backends
 
@@ -134,10 +134,11 @@ and write STAC objects. Concrete backends must implement these interfaces to be 
 
 ### `duckdb`
 
-**Go Package:** `github.com/duckontheweb/go-stac-api/backend/duckdb
+**Go Package:** `github.com/duckontheweb/go-stac-api/backend/duckdb`
 **Example:** [./example/duckdb](./example/duckdb/)
 
-This backend uses [DuckDB](https://duckdb.org/) to read STAC objects from a [persistent
+Uses the [`duckdb` driver](https://duckdb.org/docs/stable/clients/go) for [`sqlx`](https://jmoiron.github.io/sqlx/)
+to read STAC objects from a [persistent DuckDB
 database](https://duckdb.org/docs/stable/connect/overview#persistent-database). This persistent backend must have a
 `collections` tables with the following columns:
 
@@ -151,6 +152,29 @@ backend:
     type: duckdb
     connection_string: /path/to/some/database.duckdb
 ```
+
+and build the executable with `-tags duckdb`.
+
+### `pgstac`
+
+**Go Package:** `github.com/duckontheweb/go-stac-api/backend/pgstac`
+**Example:** [./example/pgstac](./example/pgstac/)
+
+Uses the [`lib/pq`](https://github.com/lib/pq) driver for [`sqlx`](https://jmoiron.github.io/sqlx/) to read STAC
+objects from a PostgreSQL database with [PgSTAC](https://stac-utils.github.io/pgstac/pgstac/) installed. You must run
+the [PgSTAC migrations](https://stac-utils.github.io/pgstac/pypgstac/#running-migrations) prior to starting the API.
+See [`./example/pgstac/load-data.sh`](./example/pgstac/load-data.sh) for an example of running migrations and bulk
+loading data.
+
+To use this backend, include the following `backend` config in your YAML config file:
+
+```yaml
+backend:
+    type: pgstac
+    connection_string: username:password@hostname:5432/dbname
+```
+
+and build the executable with `-tags pgstac`.
 
 ## Development
 
