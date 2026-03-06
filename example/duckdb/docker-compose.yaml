@@ -1,0 +1,8 @@
+services:
+  seed:
+    image: duckdb/duckdb
+    volumes:
+      - ..:/mnt
+    entrypoint: ["duckdb"]
+    working_dir: /mnt/duckdb
+    command: ["-init", "populate.sql", "data.duckdb", "-no-stdin"]

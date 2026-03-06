@@ -6,9 +6,9 @@ testdata_dir = "testdata"
 tmp_dir = ".tmp"
 
 [build]
-  args_bin = ["-config-path", "./example/${BACKEND:-duckdb}/config.yaml"]
+  args_bin = ["--", "-config-path", "./example/${BACKEND:-duckdb}/config.yaml"]
   bin = "./.tmp/main"
-  cmd = "go build -tags ${BACKEND:-duckdb} -o ./.tmp/main ./cmd/stac-server"
+  cmd = "go build -gcflags=\"all=-N -l\" -tags ${BACKEND:-duckdb} -o ./.tmp/main ./cmd/stac-server"
   delay = 1000
   entrypoint = ["./.tmp/main"]
   exclude_dir = ["assets", ".tmp", "vendor", "testdata"]
@@ -16,7 +16,7 @@ tmp_dir = ".tmp"
   exclude_regex = ["_test.go"]
   exclude_unchanged = false
   follow_symlink = false
-  full_bin = ""
+  full_bin = "dlv --listen=:2345 --headless=true --api-version=2 --accept-multiclient --log --log-output=rpc,dap,debugger exec ./.tmp/main"
   ignore_dangerous_root_dir = false
   include_dir = []
   include_ext = ["go", "tpl", "tmpl", "html"]

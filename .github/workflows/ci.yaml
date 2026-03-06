@@ -21,6 +21,12 @@ jobs:
     name: Validate STAC API
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        backend: ["duckdb", "pgstac"]
+        include:
+          - backend: pgstac
+            postgres_password: pgstac
     steps:
       - uses: actions/checkout@v6
       - name: Install uv
@@ -30,24 +36,22 @@ jobs:
           version: "0.10.4"
       - name: Set up Python
         run: uv python install
+      - name: Set up Docker Compose
+        uses: docker/setup-compose-action@v2
       - name: Install project
         run: uv sync --locked --all-extras --dev
 
-      - name: Build server
-        run: go build -tags duckdb -o /tmp/stac-server ./cmd/stac-server
-      - name: Start server
-        uses: JarvusInnovations/background-action@v1
+      - name: Run server
+        uses: hoverkraft-tech/compose-action@4894d2492015c1774ee5a13a95b1072093087ec3
+        env:
+          BACKEND: ${{ matrix.backend }}
         with:
-          run: /tmp/stac-server -config-path ./example/duckdb/config.yaml
-          wait-on: |
-            http-get://localhost:8080/
-          tail: true # true = stderr,stdout
-          log-output-resume: stderr
-          wait-for: 1m
+          compose-file: ./docker/docker-compose.yaml
+          services: api
       - name: Run stac-api-validator
         timeout-minutes: 5
         run: |
           uv run stac-api-validator \
-            --root-url http://localhost:8080 \
+            --root-url http://api:8080 \
             --conformance core --conformance collections \
             --collection naip
