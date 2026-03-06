@@ -39,17 +39,12 @@ jobs:
         run: uv sync --locked --all-extras --dev
 
       - name: Run server
-        uses: JarvusInnovations/background-action@v1
+        uses: hoverkraft-tech/compose-action@4894d2492015c1774ee5a13a95b1072093087ec3
         env:
           BACKEND: ${{ matrix.backend }}
         with:
-          run: docker compose -f ./docker/docker-compose.yaml up
-          wait-on: |
-            http-get://localhost:8080/
-          tail: true # true = stderr,stdout
-          log-output-resume: stderr
-          log-output-if: true
-          wait-for: 2m
+          compose-file: ./docker/docker-compose.yaml
+          services: api
       - name: Run stac-api-validator
         timeout-minutes: 5
         run: |
